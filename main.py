@@ -1011,7 +1011,7 @@ tmap = px.treemap(
     sunburst_df,
     path=['victory_method', 'submission_target', 'submission'],
     values=sunburst_df.index,
-    width=1000, height=1000,
+    width=1200, height=1000,
     hover_data=['victory_method', 'submission_target', 'submission'],
     color_discrete_map=px.colors.qualitative.Dark24
 )
@@ -1028,37 +1028,28 @@ tmap.update_layout(
 
 
 import plotly.subplots as sp
+
+# Female
 sdf_sex1 = mdf[mdf['female'] == 1]
 counts_sex1 = sdf_sex1['victory_method'].value_counts()
 
-
+# Male
 sdf_sex0 = mdf[mdf['female'] == 0]
 counts_sex0 = sdf_sex0['victory_method'].value_counts()
 
-
 sexpies = sp.make_subplots(rows=1, cols=2, subplot_titles=('Female', 'Male'), specs=[[{'type':'pie'}, {'type':'pie'}]])
-
 
 palette_sex1 = px.colors.qualitative.Pastel
 
-
 sexpies.add_trace(go.Pie(labels=counts_sex1.index, values=counts_sex1,
-                     marker=dict(colors=palette_sex1),textinfo='label+percent'
-                    ), row=1, col=1,
-             )
-
+                     marker=dict(colors=palette_sex1), textinfo='label+percent', hovertemplate='%{label}: %{percent}<extra>Female</extra>'), row=1, col=1)
 
 palette_sex0 = px.colors.qualitative.Dark2
 
-
 sexpies.add_trace(go.Pie(labels=counts_sex0.index, values=counts_sex0,
-                     marker=dict(colors=palette_sex0), textinfo='label+percent'),
-              row=1, col=2,
-             )
+                     marker=dict(colors=palette_sex0), textinfo='label+percent', hovertemplate='%{label}: %{percent}<extra>Male</extra>'), row=1, col=2)
 
-
-sexpies.update_layout(height=600, width=700, showlegend=False,
-                  title='Victory Method Distribution by Sex',)
+sexpies.update_layout(showlegend=False, title='Victory Method Distribution by Sex')
 
 
 
@@ -1090,7 +1081,7 @@ app.layout = html.Div([
     #dbc.Row([
     #    dbc.Col(html.H1("ADCC Data visualization", style={'textAlign': 'center', 'color': 'darkcyan', 'fontsize': '72px'}))
     #], style={'marginBottom': '40px', 'marginTop':'20px'}),
-    html.Img(src='/assets/banner.png', style={'width': '100%', 'marginBottom':'60px'}),
+    html.Img(src='/assets/banner.png', style={'width': '100%', 'marginBottom':'36px'}),
     
     html.Br(),
     
@@ -1098,21 +1089,28 @@ app.layout = html.Div([
     [
         dcc.Markdown(
             """
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu facilisis urna. Duis sollicitudin 
-            volutpat augue eu sollicitudin. Suspendisse volutpat odio id quam maximus, vitae ultricies enim varius. 
-            Mauris fringilla rhoncus dolor sed tincidunt. Donec dictum gravida bibendum. Phasellus sed lobortis turpis. 
-            Nullam ac elit dapibus, aliquam lacus at, fermentum quam. Aenean pellentesque sem a tortor feugiat 
-            placerat. Vivamus at congue velit. Duis cursus, est nec rhoncus aliquet, purus metus cursus lacus, vel 
-            consequat diam odio id ipsum. Nullam auctor venenatis gravida.
+            This is a data visualization dashboard for analyzing the ADCC submission grappling competition.  
+            It is based on data scraped from BJJ Heroes website and
+            used to create two datasets: one containing information on individual matches and one focused on individual athletes.  
+              
+            The purpose of this dashboard is to make certain trends and relationships from the data visible and understandable and promote objective insights
+            for fans of the sport.  
+             
+            Sports media and fans discussion tend to be very passionate, with narratives often stemming from subjective perceptions,
+            emotional reactions and personal preferences.  
+            In this context, data analysis and visualization tools can lead to more significant and accurate narratives and enrich insights or disprove common misconceptions.  
             
-            Sed feugiat gravida nibh eu ullamcorper. Ut sagittis fermentum feugiat. Mauris lacinia facilisis facilisis. 
-            Curabitur tristique, ligula non maximus volutpat, dolor tortor eleifend purus, eu facilisis ipsum massa sed 
-            sem. Suspendisse potenti. Aliquam sed fringilla metus, id lacinia arcu. Nullam tempor risus quis enim aliquet 
-            aliquet. For more information, visit the [website](https://www.example.com).
+            For more information, accessing the code or downloading the datasets to use as you wish, visit [Kaggle](https://www.kaggle.com/code/albucathecoder/adcc-fighters-eda-and-clustering-kmeans)  
+              
+                
+            
+            Author:  
+            [GitHub](https://github.com/fariastulioa)  
+            [LinkedIn](https://www.linkedin.com/in/tuliofarias/)
             """
         ),
     ],
-    style={'textAlign': 'justify', 'textJustify': 'inter-word', 'padding': '20px'},
+    style={'textAlign': 'center', 'textJustify': 'inter-word', 'padding': '20px'},
     ),
     
     
@@ -1125,13 +1123,16 @@ app.layout = html.Div([
     dbc.Row([html.H4(children='Match results over the years', style={'textAlign': 'center', 'marginBottom': '1px'})]),
     # 1st row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=targets_years), html.P("""Arm submissions are generally becoming more rare since the 1st edition, when it was the most common way to end matches.  
-                                                         With the exception of this edition in 1998, Neck attacks have always been the most likely submissions, having only tied with Leg attacks in 2011.""",
-                                                        style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
+        dbc.Col([dcc.Graph(figure=targets_years), html.Div([dcc.Markdown("""
+Arm submissions are generally becoming more rare since the 1st edition, when it was the most common way to end matches.  
+With the exception of this edition in 1998, Neck attacks have always been the most likely submissions, having only tied with Leg attacks in 2011.
+"""),],style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'},)],
                 xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=methods_years), html.P("""1998, 2005 and 2007 stand out as the most 'lethal' editions so far, with 52~53% of submissions.  
-                                                         Decision victory had a surge from 2011 to 2015 and has since been stable at a considerable level.  
-                                                         2000 edition had more than 70% of its matches being decided by points.""",
+        dbc.Col([dcc.Graph(figure=methods_years), html.Div([dcc.Markdown("""
+1998, 2005 and 2007 stand out as the most 'lethal' editions so far, with 52~53% of submissions.  
+Decision victory had a surge from 2011 to 2015 and has since been stable at a considerable level.  
+2000 edition had more than 70% of its matches being decided by points.
+""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
         xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1143,9 +1144,8 @@ app.layout = html.Div([
     dbc.Row([html.H4(children='Top submission and submission artists in each edition', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 2nd row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=sub_art), html.P("""Marcelo Garcia, Gordon Ryan, Roger Gracie, Jean Jacques Machado and Dean Lister standing out, with both submission and win rates considerably higher than their peers'.  
-                                                     
-                                                     Kade Ruotolo, Kron Gracie and Giancarlo Bodoni too, despite fewer total wins.""",
+        dbc.Col([dcc.Graph(figure=sub_art), html.Div([dcc.Markdown("""Marcelo Garcia, Gordon Ryan, Roger Gracie, Jean Jacques Machado and Dean Lister standing out, with both submission and win rates considerably higher than their peers'.  
+                                                                   Kade Ruotolo, Kron Gracie and Giancarlo Bodoni too, despite fewer total wins.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
         dbc.Col([dcc.Graph(figure=topsubs_year), html.P("Paulo Miyao, Royler Gracie and Ffion Davies stand out with great points differential (their total of points / their oponents')",
@@ -1158,19 +1158,13 @@ app.layout = html.Div([
     dbc.Row([html.H4(children='Biggest winners for each victory type', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 3rd row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=type_frequents), html.P("""Again, Marcelo Garcia's career stands out for his ability to submit oponents in high level competition.  
-
-                                                            
-                                                        Andre Galvao, on the other hand, seems like a more conservative player, knowing how to use the points system to win matches and achieve competition success.""",
+        dbc.Col([dcc.Graph(figure=type_frequents), html.Div([dcc.Markdown("""Again, Marcelo Garcia's career stands out for his ability to submit oponents in high level competition.  
+                                                                          Andre Galvao, on the other hand, seems like a more conservative player, knowing how to use the points system to win matches and achieve competition success.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=topwinner_targets), html.P("""Marcelo Garcia with a great number of matches ended by neck attack. Not only is he notorious for his use of guillotines, his seated guard systems for submission grappling are highly influential to this day.  
-  
-
-Dean Lister's known for introducing many of the leg attacks that later got popularized by teams focusing on the area, and has achieved many submissions with these attacks.  
-  
-
-  Comparatively, arm attacks are rarer as a choice for specialization and its submissions seem to be more distributted among the athletes.""",
+        dbc.Col([dcc.Graph(figure=topwinner_targets), html.Div([dcc.Markdown("""Marcelo Garcia with a great number of matches ended by neck attack. Not only is he notorious for his use of guillotines, his seated guard systems for submission grappling are highly influential to this day.  
+                                                                             Dean Lister's known for introducing many of the leg attacks that later got popularized by teams focusing on the area, and has achieved many submissions with these attacks.  
+                                                                             Comparatively, arm attacks are rarer as a choice for specialization and its submissions seem to be more distributted among the athletes.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1180,24 +1174,20 @@ Dean Lister's known for introducing many of the leg attacks that later got popul
     dbc.Row([html.H4(children='Match outcome and importance relationship', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 4th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=sub_imp), html.P("""The chart above clearly shows that the first round has the most risk of submissions.  
-                                                   
-The skill variance in this stage is the greatest, since all athletes are pooled together initially, which can explain the higher probability of submissions occuring.  
-  
-  This is reduced in later stages, where high skill gaps are less likely.  
-  
-  
-Superfights, on the other hand, have considerably lower submission rates. These matches happen only between the most skilled competitors, who have the most to lose. Not only are more skilled competitors more difficult to submit, they generally tend to play more defensively in these situations, which might explain these lower submission rates.
-  
-  
-  
-Semifinals display lower-than-expected submission rates, which might indicate athletes are more cautious at this stage, being faced with the prospect of competing in a final or losing the chance to do so.""",
+        dbc.Col([dcc.Graph(figure=sub_imp), html.Div([dcc.Markdown("""The chart above clearly shows that the first round has the most risk of submissions.  
+                                                                   The skill variance in this stage is the greatest, since all athletes are pooled together initially, which can explain the higher probability of submissions occuring.  
+                                                                   This is reduced in later stages, where high skill gaps are less likely.  
+                                                                   Superfights, on the other hand, have considerably lower submission rates.
+                                                                     
+                                                                       
+                                                                   These matches happen only between the most skilled competitors, who have the most to lose. Not only are more skilled competitors more difficult to submit, they generally tend to play more defensively in these situations, which might explain these lower submission rates.  
+                                                                     
+                                                                     
+                                                                   Semifinals display lower-than-expected submission rates, which might indicate athletes are more cautious at this stage, being faced with the prospect of competing in a final or losing the chance to do so.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=dec_imp), html.P("""The same trends can be seen here, with semifinals and superfights boasting high decision victory rates.  
-                                                     
-                                                    
-This means that not only are athletes more cautious about getting submitted, but also about conceding points in these situations.""",
+        dbc.Col([dcc.Graph(figure=dec_imp), html.Div([dcc.Markdown("""The same trends can be seen here, with semifinals and superfights boasting high decision victory rates.  
+                                                                   This means that not only are athletes more cautious about getting submitted, but also about conceding points in these situations.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1207,18 +1197,12 @@ This means that not only are athletes more cautious about getting submitted, but
     dbc.Row([html.H4(children='Match outcome and weight class relationship', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 5th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=weight_sub), html.P("""There are no substantial differences that can be seen from the graph above that would define a specific trend in how submission rates behave in relation to weight in general, but the heaviest weight class has lower submission rates, as does the 88 kg one.""",
+        dbc.Col([dcc.Graph(figure=weight_sub), html.Div([dcc.Markdown("""There are no substantial differences that can be seen from the graph above that would define a specific trend in how submission rates behave in relation to weight in general, but the heaviest weight class has lower submission rates, as does the 88 kg one.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=weight_target), html.P("""As shown in the chart above, neck submissions are less common in matches between heavier athletes.  
-                                                         
-
-    
-Since these submissions are more likely to happen from dominant positions while leg and arm attacks are available from a wider range of situations, one can assume this trend is due to the fact that stronger, larger fighters are less likely to be controlled.
-      
-      
-    
-Legs and arms are more exposed than the neck in the majority of positions, so athletes can target them without requiring to first secure a more dominant position.""",
+        dbc.Col([dcc.Graph(figure=weight_target), html.Div([dcc.Markdown("""As shown in the chart above, neck submissions are less common in matches between heavier athletes.  
+                                                         Since these submissions are more likely to happen from dominant positions while leg and arm attacks are available from a wider range of situations, one can assume this trend is due to the fact that stronger, larger fighters are less likely to be controlled.  
+                                                         Legs and arms are more exposed than the neck in the majority of positions, so athletes can target them without requiring to first secure a more dominant position.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1229,13 +1213,12 @@ Legs and arms are more exposed than the neck in the majority of positions, so at
     dbc.Row([html.H4(children='Open Weight (Absolute) vs Weight Class divisions', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 6th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=open_vic), html.P("""In terms of victory method, on the other hand, the absolute division shows extremely similar results as the weight class ones.
-One small yet significant difference that can be observed is in the probabilities of injury and disqualification, both more likely to happen in open weight matches.""",
+        dbc.Col([dcc.Graph(figure=open_vic), html.Div([dcc.Markdown("""In terms of victory method, on the other hand, the absolute division shows extremely similar results as the weight class ones.  
+                                                                    One small yet significant difference that can be observed is in the probabilities of injury and disqualification, both more likely to happen in open weight matches.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=open_sub), html.P("""It can be seen above that arm and neck attacks are less common in matches in the absolute division.
-
-This most likely reflects a trend of more frequent leg exchanges and entanglements in these matches, which are commonly pursued as an equalizing tactic by smaller fighters against larger ones.""",
+        dbc.Col([dcc.Graph(figure=open_sub), html.Div([dcc.Markdown("""It can be seen above that arm and neck attacks are less common in matches in the absolute division.  
+                                                                    This most likely reflects a trend of more frequent leg exchanges and entanglements in these matches, which are commonly pursued as an equalizing tactic by smaller fighters against larger ones.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1246,14 +1229,12 @@ This most likely reflects a trend of more frequent leg exchanges and entanglemen
     dbc.Row([html.H4(children='Common performance metrics', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 7th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=win_sub_title), html.P("""Only Jean Jacques Machado, Dean Lister and Gordon Ryan have been the top submission scorer in more than one ADCC edition. Dean Lister has the record at 3 editions.  
-                                                           
-                                                           Meanwhile, Roger Gracie has the most submissions in a single edition at 8, followed by Marcelo Garcia at 7 in 2005 and 2007 respectively.""",
+        dbc.Col([dcc.Graph(figure=win_sub_title), html.Div([dcc.Markdown("""Only Jean Jacques Machado, Dean Lister and Gordon Ryan have been the top submission scorer in more than one ADCC edition. Dean Lister has the record at 3 editions.  
+                                                                         Meanwhile, Roger Gracie has the most submissions in a single edition at 8, followed by Marcelo Garcia at 7 in 2005 and 2007 respectively.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=points), html.P("""Heel hooks were the most popular submission in 2011 and 2013, both being editions when Dean Lister was the top submission artist.  
-                                                    
-                                                  Despite that and two times Armbar held this position, RNC is by far the most recurrent popular submission.""",
+        dbc.Col([dcc.Graph(figure=points), html.Div([dcc.Markdown("""Heel hooks were the most popular submission in 2011 and 2013, both being editions when Dean Lister was the top submission artist.  
+                                                                  Despite that and two times Armbar held this position, RNC is by far the most recurrent popular submission.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1264,14 +1245,14 @@ This most likely reflects a trend of more frequent leg exchanges and entanglemen
     dbc.Row([html.H6(children='(athletes that have competed in finals or superfights)', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'5px'})]),
     # 8th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=high_winsub), html.P("""This type of chart showscases how impressive some athletes' achievements are, such as Ricardo Arona's undefeated status with 13 total wins and 4 titles.
-The promise Kade Ruotolo showcased winning 4 matches by submission in his first appearance also stands out.""",
+        dbc.Col([dcc.Graph(figure=high_winsub), html.Div([dcc.Markdown("""This type of chart showscases how impressive some athletes' achievements are, such as Ricardo Arona's undefeated status with 13 total wins and 4 titles.  
+                                                                       The promise Kade Ruotolo showcased winning 4 matches by submission in his first appearance also stands out.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=high_subscore), html.P("""Custom Score is an engineered feature calculated using different metrics such as victories/losses at each competition level and number of appearances by the athlete.
-                                                  This chart clearly displays the difference between those who never got to showcase their preferred target for submissions at the highest level and those who could.
-It's also possible to see that Arm specialist in general displayed similar results with this metrics, so Fabricio Werdum, Ronaldo Souza, Alexandre Ribeiro and FFion Davies are packed in close proximity. Kade Ruotolo's an evident outlier from this group, as is Ricardo Arona for the Leg attackers.
-Being the most common preferred target among athletes, Neck attackers are a more broadly distributted group here.""",
+        dbc.Col([dcc.Graph(figure=high_subscore), html.Div([dcc.Markdown("""Custom Score is an engineered feature calculated using different metrics such as victories/losses at each competition level and number of appearances by the athlete.  
+                                                                         This chart clearly displays the difference between those who never got to showcase their preferred target for submissions at the highest level and those who could.  
+                                                                         It's also possible to see that Arm specialist in general displayed similar results with this metrics, so Fabricio Werdum, Ronaldo Souza, Alexandre Ribeiro and FFion Davies are packed in close proximity. Kade Ruotolo's an evident outlier from this group, as is Ricardo Arona for the Leg attackers.  
+                                                                         Being the most common preferred target among athletes, Neck attackers are a more broadly distributted group here.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1281,12 +1262,11 @@ Being the most common preferred target among athletes, Neck attackers are a more
     dbc.Row([html.H4(children='Distribution of competition success among athletes', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 9th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=highest_match), html.P("""It makes sense to logically expect this chart to have decreasing heights from left to right on the bars, since more important bouts are fought by athletes who bested others in previous rounds, but that's not what can be seen here.
-
-Since there's a lot of missing data in the original data source (BJJ Heroes ADCC bouts stats), this distribution might be explained by the probable trend that more important bouts are more likely to have data available on the website.""",
+        dbc.Col([dcc.Graph(figure=highest_match), html.Div([dcc.Markdown("""It makes sense to logically expect this chart to have decreasing heights from left to right on the bars, since more important bouts are fought by athletes who bested others in previous rounds, but that's not what can be seen here.  
+                                                                         Since there's a lot of missing data in the original data source (BJJ Heroes ADCC bouts stats), this distribution might be explained by the probable trend that more important bouts are more likely to have data available on the website.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=total_wins), html.P("""The distribution closely follows the logic that success in competitive sports can be visualized as a pyramid with the most successful athletes being a few at the top and many at the bottom with less success.""",
+        dbc.Col([dcc.Graph(figure=total_wins), html.Div([dcc.Markdown("""The distribution closely follows the logic that success in competitive sports can be visualized as a pyramid with the most successful athletes being a few at the top and many at the bottom with less success.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5)
 
@@ -1296,14 +1276,12 @@ Since there's a lot of missing data in the original data source (BJJ Heroes ADCC
     dbc.Row([html.H4(children='Different submissions scored by athletes', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 10th row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=body_parts), html.P("""Since ADCC is a highly sought after prestigious event for elite grapplers for all over the world, the level of competition in the event is high enough that it's usually hard for them to submit each other.
-Even with a ruleset specifically tweaked to increase submission rates, it's not uncommon for athletes to play defensively, given how much is at stake.
-Because of that, we can see that most fighters don't have enough submission data (from ADCC boughts, at least) available for us to determine what their preferred target when submitting oponents is or where they are most vulnerable to being submitted.
-
-Still, it can be seen that wee have more leg specialists than arm specialists but even combined they are not as numerous as the athletes who get their most submissions by neck attacks.""",
+        dbc.Col([dcc.Graph(figure=body_parts), html.Div([dcc.Markdown("""We can see that most fighters don't have enough submission data (from ADCC boughts, at least) available for us to determine what their preferred target when submitting oponents is or where they are most vulnerable to being submitted.  
+                                                                      Still, it can be seen that there are more leg specialists than arm specialists but even combined they are not as numerous as the athletes who get their most submissions by neck attacks.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=n_subs), html.P("""The 0 bar shows that almost 80% of ADCC competitors has never submitted an opponent in the event.""",
+        dbc.Col([dcc.Graph(figure=n_subs), html.Div([dcc.Markdown("""The 0 bar shows that almost 80% of ADCC competitors has never submitted an opponent in the event.  
+                                                                  Aproximately 10% have submission win(s) from a single submission and only the remaining 10% have won matches with different submissions.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5)
         
@@ -1315,13 +1293,14 @@ Still, it can be seen that wee have more leg specialists than arm specialists bu
     dbc.Row([html.H4(children='Athletes stats by debut year', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 11st row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=winrate_debut), html.P("""It's worth noting that a "talent drought" or shortage of capable fresh athletes was never experienced in ADCC, with fighters from all the different generations going on to achieve impressive and or unprecedented feats.
-Alexandre Ribeiro had the most total wins among athletes who had their debut in the first decade (1998-2008) of the competition, Andre Galvao in the second decade (2008-2018)and Gordon Ryan in the third and current decade (2018-present).
-""",
+        dbc.Col([dcc.Graph(figure=winrate_debut), html.Div([dcc.Markdown("""It's worth noting that a "talent drought" or shortage of capable fresh athletes was never experienced in ADCC, with fighters from all the different generations going on to achieve impressive and or unprecedented feats.  
+                                                                         Alexandre Ribeiro had the most total wins among athletes who had their debut in the first decade (1998-2008) of the competition, Andre Galvao in the second decade (2008-2018)and Gordon Ryan in the third and current decade (2018-present).
+""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=subs_debut), html.P("""This plot highlights the impressive achievements of different athletes than the previous ones, since there's a comparison being made within "generations". Examples are Jean Jaques Machado, Dean Lister, Kade Ruotolo, Kron Gracie and Rousimar Palhares.
-Bianca Mesquita and Ana Carolina Vieira are also considerably ahead of their peers.""",
+        dbc.Col([dcc.Graph(figure=subs_debut), html.Div([dcc.Markdown("""This plot highlights the impressive achievements of different athletes than the previous ones, since there's a comparison being made within "generations".  
+                                                                      Examples are Jean Jaques Machado, Dean Lister, Kade Ruotolo, Kron Gracie and Rousimar Palhares.  
+                                                                      Bianca Mesquita and Ana Carolina Vieira are also considerably ahead of their peers.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5)
         
@@ -1332,12 +1311,12 @@ Bianca Mesquita and Ana Carolina Vieira are also considerably ahead of their pee
     dbc.Row([html.H4(children='Further explorations on titles distribution', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 12nd row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=titles), html.P("""The plot above highlights some of the most memorable athletes who were never champions such as Rousimar Palhares, Craig Jones, Joao Miyao and Ricardo Almeida. It also makes some exceptional champions stand out such as Gordon Ryan, Marcelo Garcia and Ricardo Arona.
-""",
+        dbc.Col([dcc.Graph(figure=titles), html.Div([dcc.Markdown("""The plot above highlights some of the most memorable athletes who were never champions such as Rousimar Palhares, Craig Jones, Joao Miyao and Ricardo Almeida.  
+                                                                  It also makes some exceptional champions stand out such as Gordon Ryan, Marcelo Garcia and Ricardo Arona.""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=win_imp), html.P("""It can be seen that the average match importance for fighters is not a good feature to differentiate them, since most of them appear closely packed together in the above chart.  
-The trend observed here (of positive correlation between match importance and average win rate) is to be expected since fighters advance to later stages (matches with higher importance) by winning matches with less importance.""",
+        dbc.Col([dcc.Graph(figure=win_imp), html.Div([dcc.Markdown("""It can be seen that the average match importance for fighters is not a good feature to differentiate them, since most of them appear closely packed together in the above chart.  
+                                                                   The trend observed here (of positive correlation between match importance and average win rate) is to be expected since fighters advance to later stages (matches with higher importance) by winning matches with less importance.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5)
         
@@ -1349,11 +1328,11 @@ The trend observed here (of positive correlation between match importance and av
     dbc.Row([html.H4(children='Changes in leg attacks over the years', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'25px'})]),
     # 13rd row content
     dbc.Row([
-        dbc.Col([dcc.Graph(figure=heelhook), html.P("""Heel hooks have transitioned from a rare occurance to one of the most used leg attacks in submission grappling, with a surge in 2011 followed by its popularization among the athlete pool.
-""",
+        dbc.Col([dcc.Graph(figure=heelhook), html.Div([dcc.Markdown("""Heel hooks have transitioned from a rare occurance to one of the most used leg attacks in submission grappling, with a surge in 2011 followed by its popularization among the athlete pool.
+""")],
                                                 style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '70px', 'marginRight':'0px'})],
                 xs=7, sm=7, md=7, lg=5, xl=5),
-        dbc.Col([dcc.Graph(figure=kneebar), html.P("""Kneebars, on the other hand, are becoming more rare since 2001. After the rise of the heel hook in 2011, it has only happened twice.""",
+        dbc.Col([dcc.Graph(figure=kneebar), html.Div([dcc.Markdown("""Kneebars, on the other hand, are becoming more rare since 2001. After the rise of the heel hook in 2011, it has only happened twice.""")],
                                                         style={'textAlign': 'center', 'max-width': '640px', 'marginLeft': '40px', 'marginRight':'10px'})],
         xs=7, sm=7, md=7, lg=5, xl=5)
         
@@ -1369,20 +1348,20 @@ The trend observed here (of positive correlation between match importance and av
             dbc.Col(
                 [
                     dcc.Graph(figure=tmap, style={'textAlign': 'center'}),
-                    html.P(
+                    html.Div([dcc.Markdown(
                         """
                         Since athletes do not wear kimonos for ADCC matches, It's surprising to find that armbars are 
                         so prevalent among arm targetting attacks, considering the grips for shoulder locks such as 
-                        kimuras and americanas are usually harder to get out of in no-gi grappling.
-                        
+                        kimuras and americanas are usually harder to get out of in no-gi grappling.  
+                                                
                         Leg attacks are the group with the most variety and more evenly spread numbers, which can be 
                         attributed to the fact that leg entries and entanglements often threaten multiple lower body 
                         submissions simultaneously. In this context, it makes sense for athletes to try for a variety 
-                        of these finishing moves when going for these positions.
-                        
+                        of these finishing moves when going for these positions.  
+                                                
                         It's worth noting that the overall submission rates for ADCC are good from a spectator's 
                         perspective, as the constant threat of match-ending action make watching them more enticing.
-                        """,
+                        """)],
                         style={'textAlign': 'center', 'marginLeft': '50px', 'marginRight':'50px', 'marginTop':'0px'}
                     )
                 ],
@@ -1402,11 +1381,11 @@ The trend observed here (of positive correlation between match importance and av
             dbc.Col(
                 [
                     dcc.Graph(figure=sexpies, style={'textAlign': 'center', 'marginBottom':'1px', 'marginLeft':'auto', 'marginRight':'auto'}),
-                    html.P(
+                    html.Div([dcc.Markdown(
                         """
-                        Women have been thrice as likely to have matches ended due to injury than men, and also have considerable more judges decisions to define match outcome.
-The submission rates are surprisingly similar, despite common notion that women in general are more technically responsible about defense than men.
-                        """,
+                        Women have been thrice as likely to have matches ended due to injury than men, and also have considerable more judges decisions to define match outcome.  
+                        The submission rates are surprisingly similar, despite common notion that women in general are more technically responsible about defense than men.
+                        """)],
                         style={'textAlign': 'center', 'marginLeft': '50px', 'marginRight':'50px', 'marginTop':'0px'}
                     )
                 ],
@@ -1418,6 +1397,11 @@ The submission rates are surprisingly similar, despite common notion that women 
     ),
     
 ])
+
+
+
+app.title = 'ADCC Data'
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
