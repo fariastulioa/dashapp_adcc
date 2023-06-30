@@ -598,7 +598,7 @@ high_winsub = px.scatter(highlvl, x='win_ratio', y='sub_win_ratio', hover_name="
                 size='total_wins', size_max=40, opacity=0.6,
                 color_discrete_sequence=px.colors.sequential.Plasma,
                 labels={'color': 'Number of titles'},
-                width=800, height=800)
+                width=640, height=640)
 
 # Add a constant dashed line at the x=y diagonal
 high_winsub.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines',
@@ -638,7 +638,7 @@ high_winsub.update_layout(annotations=legend_annotations)
 # Generates the chart object by instanciating a plotly express histogram
 high_subscore = px.scatter(highlvl, x='custom_score', y='sub_win_ratio', hover_name="name",
                  color='favorite_target', labels={'favorite_target': 'Most frequent submission target'},
-                width=900, height=810, size='total_wins', log_x=True,
+                width=720, height=640, size='total_wins', log_x=True,
                 color_discrete_sequence=px.colors.qualitative.Bold, size_max=40)
 
 
@@ -891,7 +891,7 @@ fdf.sort_values(by='n_titles', ascending=True, inplace=True)
 # Generates the chart object by instanciating a plotly express histogram
 titles= px.scatter(fdf, x='custom_score', y='sub_win_ratio', hover_name="name",
                  color=fdf['n_titles'].astype(str), labels={'color': 'Number of titles'},
-                width=800, height=800, size='total_wins', log_x=True,
+                width=720, height=640, size='total_wins', log_x=True,
                 color_discrete_sequence=px.colors.sequential.Sunsetdark, size_max=40)
 
 
@@ -930,7 +930,7 @@ titles.update_layout(annotations=legend_annotations)
 win_imp = px.scatter(fdf, x='avg_match_importance', y='win_ratio', hover_name="name",
                  color=fdf['champion'].astype(str), labels={'color': 'Has title?'},
                 size='total_wins', size_max=30,
-                width=900, height=810)
+                width=640, height=640)
 
 
 win_imp.update_layout(
@@ -1011,7 +1011,6 @@ tmap = px.treemap(
     sunburst_df,
     path=['victory_method', 'submission_target', 'submission'],
     values=sunburst_df.index,
-    width=1200, height=1000,
     hover_data=['victory_method', 'submission_target', 'submission'],
     color_discrete_map=px.colors.qualitative.Dark24
 )
