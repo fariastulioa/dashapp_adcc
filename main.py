@@ -1056,7 +1056,7 @@ sexpies.update_layout(showlegend=False, title='Victory Method Distribution by Se
 
 
 
-# server = Flask(__name__)
+
 app = dash.Dash(__name__,
                 external_stylesheets=[{
         "href": (
@@ -1067,10 +1067,85 @@ app = dash.Dash(__name__,
     },
             dbc.themes.BOOTSTRAP,
             dbc.icons.BOOTSTRAP]) #server = server
-# server = app.server
+server = app.server
+
+
+@app.callback(
+    Output('output-bar-chart', 'figure'),
+    Input('year-slider', 'value')
+)
+def update_bar_chart(year_range):
+    min_year, max_year = year_range
+    filtered_df = mdf[(mdf['year'] >= min_year) & (mdf['year'] <= max_year)]
+    top_athletes = filtered_df['winner_name'].value_counts().nlargest(5)
+
+    fig = px.bar(
+        top_athletes,
+        x=top_athletes.index,
+        y=top_athletes.values,
+        labels={'x': 'Athlete', 'y': 'Number of Wins'},
+        title=f'Top 5 Athletes with Most Wins (From {min_year} to {max_year})',
+        color_continuous_scale=px.colors.sequential.Teal,
+        color = top_athletes.values,
+    )
+
+    fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
+    
+    return fig
 
 
 
+
+@app.callback(
+    Output('output-sub-chart', 'figure'),
+    Input('year-slider', 'value')
+)
+def update_sub_chart(year_range):
+    min_year, max_year = year_range
+    filtered_df = mdf[(mdf['year'] >= min_year) & (mdf['year'] <= max_year)]
+    filtered_df = filtered_df[filtered_df['victory_method'] == 'SUBMISSION']
+    top_athletes = filtered_df['winner_name'].value_counts().nlargest(5)
+
+    fig = px.bar(
+        top_athletes,
+        x=top_athletes.index,
+        y=top_athletes.values,
+        labels={'x': 'Athlete', 'y': 'Number of Submissions'},
+        title=f'Top 5 Athletes with Most Submissions (From {min_year} to {max_year})',
+        color_continuous_scale=px.colors.sequential.Teal,
+        color = top_athletes.values,
+    )
+
+    fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
+    
+    return fig
+
+
+titles_df = mdf[mdf['importance'] > 3]
+
+
+@app.callback(
+    Output('output-title-chart', 'figure'),
+    Input('year-slider', 'value')
+)
+def update_title_chart(year_range):
+    min_year, max_year = year_range
+    filtered_df = titles_df[(titles_df['year'] >= min_year) & (titles_df['year'] <= max_year)]
+    top_athletes = filtered_df['winner_name'].value_counts().nlargest(5)
+
+    fig = px.bar(
+        top_athletes,
+        x=top_athletes.index,
+        y=top_athletes.values,
+        labels={'x': 'Athlete', 'y': 'Number of Titles'},
+        title=f'Top 5 Athletes with Title wins (From {min_year} to {max_year})',
+        color_continuous_scale=px.colors.sequential.Teal,
+        color = top_athletes.values,
+    )
+
+    fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
+    
+    return fig
 
 
 
@@ -1114,10 +1189,10 @@ app.layout = html.Div([
     
     
     
-    
-    
     # Content
     
+    
+        
     # 1st row title
     dbc.Row([html.H4(children='Match results over the years', style={'textAlign': 'center', 'marginBottom': '1px'})]),
     # 1st row content
@@ -1394,6 +1469,48 @@ Decision victory had a surge from 2011 to 2015 and has since been stable at a co
         ],
         className='g-0 justify-content-center align-items-center'
     ),
+    
+    dbc.Row(html.Hr(style={'border-color': 'lightgray', 'marginBottom':'0px', 'marginTop':'25px'})),
+    # 0th row title
+    dbc.Row([html.H3(children='Visualizing specific time frames', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'4px', 'color': 'darkcyan', 'fontWeight': 'bold'})]),
+    dbc.Row([html.H6(children='(Drag start and end year to specify a time interval)', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'5px', 'color': 'lightskyblue'})]),
+    # 0h row content
+    dbc.Row(
+        [
+            dbc.Col(
+                [   
+                    html.Div([dcc.Graph(id='output-bar-chart'),
+                    
+])
+                ],
+                width=12,
+                className='justify-content-center align-items-center', xs=9, sm=9, md=9, lg=7, xl=7
+            ),dbc.Col([html.Div([dcc.Markdown(
+                        """
+                        These charts help better understand and contextualize all the *"of all time"* discussions that happens through the years.  
+                        The chronological navigation can put the total bulk of accomplishments in perspective for athletes of each generation.  
+                        It can also to some degree be used to gauge the longevity of some elite grapplers competitiveness.
+                        """)],
+                        style={'textAlign': 'center', 'marginLeft': '50px', 'marginRight':'50px', 'marginTop':'20px'}
+                    ),])
+            
+        ],
+        className='g-0 justify-content-center align-items-center', style={'marginBottom': '1px', 'marginTop':'1px'}
+    ),
+    dbc.Row([dcc.RangeSlider(
+                        id='year-slider',
+                        min=mdf['year'].min(),
+                        max=mdf['year'].max(),
+                        value=[mdf['year'].min(), mdf['year'].max()],
+                        marks={str(year): str(year) for year in mdf['year'].unique()},
+                        step=None
+                        )],style={'textAlign': 'center', 'marginLeft': '50px', 'marginRight':'50px', 'marginTop':'5px', 'marginBottom':'5px'}),
+    dbc.Row([html.H6(children='(Drag years on the slider above)', style={'textAlign': 'center', 'marginBottom': '1px', 'marginTop':'5px', 'color': 'lightskyblue'})]),
+    dbc.Row([
+        dbc.Col(html.Div([dcc.Graph(id='output-sub-chart')])),
+        dbc.Col(html.Div([dcc.Graph(id='output-title-chart')]))
+
+    ], className="g-0",  justify="evenly"),
     
 ])
 
