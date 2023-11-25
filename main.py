@@ -34,8 +34,10 @@ mdf = pd.read_csv('adcc_matches.csv')
 # Plots the distribution between win rates and submission rates
 # Generates the chart object by instanciating a plotly express histogram
 win_sub_title = px.scatter(fdf, x='win_ratio', y='sub_win_ratio', hover_name="name",
-                color=fdf['champion'].astype(str), labels={'color': 'Has title?'},
-                size='total_wins', width=600, height=600)
+                color=fdf['champion'].astype(str),
+                labels={'color': 'Has title?', 'total_wins':'Total wins', 'sub_win_ratio':'Submission ratio', 'win_ratio':'Win ratio'},
+                size='total_wins', width=600, height=600,
+                hover_data={'champion':False})
 
 
 win_sub_title.update_layout(
@@ -74,10 +76,10 @@ win_sub_title.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines',
 
 
 points = px.scatter(fdf, x='suffered_points_per_fight', y='scored_points_per_fight', hover_name="name",
-                color=fdf['female'].astype(str),
-                    labels={'color': 'Sex', 'suffered_points_per_fight':'Avg. points conceded', 'scored_points_per_fight':'Avg. points scored'},
-                    width=600, height=600,
-                   hover_data={'color':False})
+    color=fdf['female'].astype(str), hover_data={'female':False},
+    labels={'color': 'Sex', 'suffered_points_per_fight':'Avg. points conceded', 'scored_points_per_fight':'Avg. points scored'},
+    width=600, height=600,
+    )
 
 
 
@@ -98,7 +100,6 @@ points.update_layout(
 # Renames the legend labels for understandability
 newnames = {'0':'Male', '1': 'Female'}
 points.for_each_trace(lambda t: t.update(name = newnames[t.name]))
-
 
 
 # Generating methods over years plot
@@ -131,7 +132,8 @@ targets_years = px.line(likelihood_mdf, x='year', y='likelihood', color='submiss
             hover_name='submission_target', width=600, height=600,
             color_discrete_sequence=px.colors.qualitative.Dark24)
 
-targets_years.update_traces(line_width=3)
+targets_years.update_traces(line_width=3,
+    hovertemplate="%{x}<br>Percentage of submissions: %{y:.2f}")
 
 
 targets_years.update_yaxes(title_text='Submission ratio (%)')
@@ -365,7 +367,7 @@ sub_imp = px.bar(data_frame=submission_ratio_mdf, x=submission_ratio_mdf['import
             'x':'Match importance'},
             title='Probability of Submission by match importance',
             text=submission_ratio.values.round(2),  # Display percentage values inside bars
-            hover_data={'importance': False, 'text':False, 'submission_ratio': ':.2f'},
+            hover_data={'importance': False, 'submission_ratio': ':.2f'},
             color_continuous_scale=px.colors.sequential.Sunsetdark,
             color='importance', hover_name='importance')
 
@@ -383,7 +385,8 @@ custom_labels = {
 sub_imp.update_xaxes(ticktext=list(custom_labels.values()),
                 tickvals=list(custom_labels.keys()))
 
-sub_imp.update_traces(textposition='inside')  # Position the text inside the bars
+sub_imp.update_traces(textposition='inside',
+    hovertemplate="%{x}<br>Percentage of submissions: %{y:.2f}")  # Position the text inside the bars
 sub_imp.update_layout(showlegend=False, coloraxis_showscale=False,
                 title_x=0.48)
 
@@ -402,11 +405,11 @@ decision_ratio_mdf = pd.DataFrame({'importance': decision_ratio.index, 'decision
 # Plot the bars with plotly express
 dec_imp = px.bar(data_frame=decision_ratio_mdf, x=decision_ratio_mdf['importance'].astype(str),
             y='decision_ratio',labels={'importance': 'Importance',
-                                        'Decision victory ratio (%)': 'decision Ratio (%)',
+                                        'decision_ratio': 'Decision Ratio (%)',
         'x':'Match importance'},
             title='Probability of Decision by match importance',
             text=decision_ratio.values.round(2),  # Display percentage values inside bars
-            hover_data={'importance': False, 'text': False, 'decision_ratio': ':.2f'},
+            hover_data={'importance': False, 'decision_ratio': ':.2f'},
             color_continuous_scale=px.colors.sequential.Sunsetdark,
             color='importance')
 
@@ -414,7 +417,8 @@ dec_imp = px.bar(data_frame=decision_ratio_mdf, x=decision_ratio_mdf['importance
 dec_imp.update_xaxes(ticktext=list(custom_labels.values()),
                 tickvals=list(custom_labels.keys()))
 
-dec_imp.update_traces(textposition='inside') 
+dec_imp.update_traces(textposition='inside',
+    hovertemplate="%{x}<br>Percentage of decisions: %{y}") 
 dec_imp.update_layout(showlegend=False, coloraxis_showscale=False,
                 yaxis_title="Probability of victory by decision (%)",
                 title_x=0.48, yaxis=dict(side='right'))
@@ -525,8 +529,8 @@ grouped_data['relative_frequency'] = grouped_data.groupby('absolute')['count'].t
 
 # Create the bar chart using Plotly Express
 open_sub = px.bar(grouped_data, x='absolute', y='relative_frequency',
-             color='submission_target', labels={'absolute':'Division', 'relative_frequency':'Relative Frequency'},
-                 hover_data={'absolute': True, 'relative_frequency': ':.2f', 'victory_method': True})
+    color='submission_target', labels={'absolute':'Division', 'relative_frequency':'Relative Frequency', 'submission_target':'Submission target'},
+    hover_data={'absolute': True, 'relative_frequency': ':.2f'})
 
 # Calculate the x-coordinate for each annotation
 grouped_data['cumulative_relative_frequency'] = grouped_data.groupby('absolute')['relative_frequency'].cumsum() - 0.5 * grouped_data['relative_frequency']
@@ -865,7 +869,7 @@ winrate_debut.update_layout(annotations=legend_annotations)
 subs_debut = px.scatter(fdf, x='debut_year', y='sub_win_ratio', hover_name="name",
                 color=fdf['favorite_target'].astype(str),
                 size='total_wins', size_max=30, opacity=0.6,
-                labels={'color': 'Favorite target', 'debut_year':'Debut year', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'}))
+                labels={'color': 'Favorite target', 'debut_year':'Debut year', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'})
 
 
 subs_debut.update_layout(
@@ -943,7 +947,7 @@ win_imp = px.scatter(fdf, x='avg_match_importance', y='win_ratio', hover_name="n
                 labels={'color': 'Has title?', 'avg_match_importance':'Avg. match importance', 'win_ratio':'Win ratio', 'total_wins':'Total wins'},
                 size='total_wins', size_max=30,
                 width=640, height=640,
-                hover_data={'color': False})
+                hover_data={'champion': False})
 
 
 win_imp.update_layout(
@@ -1099,11 +1103,12 @@ def update_bar_chart(year_range):
         labels={'x': 'Athlete', 'y': 'Number of Wins'},
         title=f'Top 5 Athletes with Most Wins (From {min_year} to {max_year})',
         color_continuous_scale=px.colors.sequential.Teal,
-        color = top_athletes.values,
+        color = top_athletes.values
+        
     )
 
     fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
-    
+    fig.update_traces(hovertemplate="Athlete: %{x}<br>Wins: %{y}")
     return fig
 
 
@@ -1130,7 +1135,7 @@ def update_sub_chart(year_range):
     )
 
     fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
-    
+    fig.update_traces(hovertemplate="Athlete: %{x}<br>Submissions: %{y}")
     return fig
 
 
@@ -1157,7 +1162,7 @@ def update_title_chart(year_range):
     )
 
     fig.update_layout(xaxis_title="Athlete name", showlegend=False, coloraxis_showscale=False)
-    
+    fig.update_traces(hovertemplate="Athlete: %{x}<br>Titles: %{y}")
     return fig
 
 
