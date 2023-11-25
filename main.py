@@ -74,7 +74,10 @@ win_sub_title.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines',
 
 
 points = px.scatter(fdf, x='suffered_points_per_fight', y='scored_points_per_fight', hover_name="name",
-                color=fdf['female'].astype(str), labels={'color': 'Sex'}, width=600, height=600)
+                color=fdf['female'].astype(str),
+                    labels={'color': 'Sex', 'suffered_points_per_fight':'Avg. points conceded', 'scored_points_per_fight':'Avg. points scored'},
+                    width=600, height=600,
+                   hover_data={'color':False})
 
 
 
@@ -192,8 +195,8 @@ topsubs_year = go.Figure(data=go.Bar(
     text=max_submissions['submission'],
     hovertemplate=
     '<b>Year</b>: %{y}<br>' +
-    '<b>Fighter</b>: %{text}<br>' +
-    '<b>Submissions</b>: %{x}<extra></extra>',
+    '<b>Submission</b>: %{text}<br>' +
+    '<b>Occurrences</b>: %{x}<extra></extra>',
     orientation='h',
     textposition='inside',  # Set text position inside the bars
     textfont={'size': 14},  # Adjust the text font size
@@ -362,7 +365,7 @@ sub_imp = px.bar(data_frame=submission_ratio_mdf, x=submission_ratio_mdf['import
             'x':'Match importance'},
             title='Probability of Submission by match importance',
             text=submission_ratio.values.round(2),  # Display percentage values inside bars
-            hover_data={'importance': True, 'submission_ratio': ':.2f'},
+            hover_data={'importance': False, 'text':False, 'submission_ratio': ':.2f'},
             color_continuous_scale=px.colors.sequential.Sunsetdark,
             color='importance', hover_name='importance')
 
@@ -403,7 +406,7 @@ dec_imp = px.bar(data_frame=decision_ratio_mdf, x=decision_ratio_mdf['importance
         'x':'Match importance'},
             title='Probability of Decision by match importance',
             text=decision_ratio.values.round(2),  # Display percentage values inside bars
-            hover_data={'importance': True, 'decision_ratio': ':.2f'},
+            hover_data={'importance': False, 'text': False, 'decision_ratio': ':.2f'},
             color_continuous_scale=px.colors.sequential.Sunsetdark,
             color='importance')
 
@@ -443,7 +446,7 @@ for _, row in grouped_data.iterrows():
         yanchor='middle'
     )
 
-weight_target.update_traces(hovertemplate='%{x} Weight Class: %{y} submission ratio')
+weight_target.update_traces(hovertemplate='%{x} Weight Class: %{y:.2f} submission ratio')
 
 weight_target.update_layout(
     title='Target body part of successful submissions',
@@ -522,7 +525,8 @@ grouped_data['relative_frequency'] = grouped_data.groupby('absolute')['count'].t
 
 # Create the bar chart using Plotly Express
 open_sub = px.bar(grouped_data, x='absolute', y='relative_frequency',
-             color='submission_target')
+             color='submission_target', labels={'absolute':'Division', 'relative_frequency':'Relative Frequency'},
+                 hover_data={'absolute': True, 'relative_frequency': ':.2f', 'victory_method': True})
 
 # Calculate the x-coordinate for each annotation
 grouped_data['cumulative_relative_frequency'] = grouped_data.groupby('absolute')['relative_frequency'].cumsum() - 0.5 * grouped_data['relative_frequency']
@@ -568,7 +572,7 @@ likelihood_mdf['likelihood'] *= 100
 
 # Create stacked bar chart using plotly express
 open_vic = px.bar(likelihood_mdf, x='absolute', y='likelihood', color='victory_method',
-            labels={'likelihood': 'Probability (%)', 'victory_method': 'Victory by'},
+            labels={'likelihood': 'Probability (%)', 'victory_method': 'Victory by', 'absolute':'Division'},
             title='Victory types on Open weight Vs. Weight class divisions',
             hover_data={'absolute': True, 'likelihood': ':.2f', 'victory_method': True},
             barmode='stack',
@@ -597,7 +601,7 @@ high_winsub = px.scatter(highlvl, x='win_ratio', y='sub_win_ratio', hover_name="
                 color=highlvl['n_titles'].astype(str),
                 size='total_wins', size_max=40, opacity=0.6,
                 color_discrete_sequence=px.colors.sequential.Plasma,
-                labels={'color': 'Number of titles'},
+                labels={'color': 'Number of titles', 'win_ratio':'Win ratio', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'},
                 width=640, height=640)
 
 # Add a constant dashed line at the x=y diagonal
@@ -637,7 +641,8 @@ high_winsub.update_layout(annotations=legend_annotations)
 
 # Generates the chart object by instanciating a plotly express histogram
 high_subscore = px.scatter(highlvl, x='custom_score', y='sub_win_ratio', hover_name="name",
-                 color='favorite_target', labels={'favorite_target': 'Most frequent submission target'},
+                 color='favorite_target',
+                labels={'favorite_target': 'Most frequent submission target', 'custom_score':'Custom Score', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'},
                 width=720, height=640, size='total_wins', log_x=True,
                 color_discrete_sequence=px.colors.qualitative.Bold, size_max=40)
 
@@ -677,7 +682,8 @@ high_subscore.update_layout(annotations=legend_annotations, yaxis=dict(side='rig
 
 
 # Generates the chart object by instanciating a plotly express histogram 
-highest_match = px.histogram(x=fdf['highest_match_importance'])
+highest_match = px.histogram(x=fdf['highest_match_importance'],
+                            labels={'count':'N. of athletes', 'x':'Match type'})
 highest_match.update_layout(
     title={
         'text': "Distribution of highest match importance fighter competed in",
@@ -715,7 +721,8 @@ highest_match.update_xaxes(ticktext=list(custom_labels.values()),
 
 
 # Generates the chart object by instanciating a plotly express histogram 
-total_wins = px.histogram(fdf, x='total_wins')
+total_wins = px.histogram(fdf, x='total_wins',
+                         labels={'total_wins':'Total matches won by athlete', 'count':'N. of athletes'})
 total_wins.update_layout(
     title={
         'text': "Distribution of total matches the athlete won",
@@ -793,7 +800,8 @@ body_parts.update_layout(legend=dict(
 
 
 # Generates the chart object by instanciating a plotly express histogram 
-n_subs = px.histogram(fdf, x='n_different_subs', hover_name="n_different_subs")
+n_subs = px.histogram(fdf, x='n_different_subs', hover_name="n_different_subs",
+labels={'n_different_subs':'N. of different submissions scored', 'count':'N. of athletes'})
 n_subs.update_layout(
     title={
         'text': "Distribution of number of different submissions",
@@ -818,7 +826,8 @@ n_subs.update_traces(text=percentages.round(2).astype(str) + '%', textposition='
 
 winrate_debut = px.scatter(fdf, x='debut_year', y='win_ratio', hover_name="name",
                 color=fdf['favorite_target'].astype(str),
-                size='total_wins', size_max=30, opacity=0.6, labels={'color': 'Favorite target'})
+                size='total_wins', size_max=30, opacity=0.6,
+                labels={'color': 'Favorite target', 'debut_year':'Debut year', 'win_ratio':'Win ratio', 'total_wins':'Total wins'})
 
 
 winrate_debut.update_layout(
@@ -854,8 +863,9 @@ winrate_debut.update_layout(annotations=legend_annotations)
 
 # Generates the chart object by instanciating a plotly express histogram
 subs_debut = px.scatter(fdf, x='debut_year', y='sub_win_ratio', hover_name="name",
-                 color=fdf['favorite_target'].astype(str),
-                size='total_wins', size_max=30, opacity=0.6, labels={'color': 'Favorite target'})
+                color=fdf['favorite_target'].astype(str),
+                size='total_wins', size_max=30, opacity=0.6,
+                labels={'color': 'Favorite target', 'debut_year':'Debut year', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'}))
 
 
 subs_debut.update_layout(
@@ -890,7 +900,8 @@ subs_debut.update_layout(annotations=legend_annotations)
 fdf.sort_values(by='n_titles', ascending=True, inplace=True)
 # Generates the chart object by instanciating a plotly express histogram
 titles= px.scatter(fdf, x='custom_score', y='sub_win_ratio', hover_name="name",
-                 color=fdf['n_titles'].astype(str), labels={'color': 'Number of titles'},
+                color=fdf['n_titles'].astype(str),
+                labels={'color': 'Number of titles','custom_score':'Custom Score', 'sub_win_ratio':'Submission ratio', 'total_wins':'Total wins'},
                 width=720, height=640, size='total_wins', log_x=True,
                 color_discrete_sequence=px.colors.sequential.Sunsetdark, size_max=40)
 
@@ -928,9 +939,11 @@ titles.update_layout(annotations=legend_annotations)
 
 # Generates the chart object by instanciating a plotly express histogram
 win_imp = px.scatter(fdf, x='avg_match_importance', y='win_ratio', hover_name="name",
-                 color=fdf['champion'].astype(str), labels={'color': 'Has title?'},
+                color=fdf['champion'].astype(str),
+                labels={'color': 'Has title?', 'avg_match_importance':'Avg. match importance', 'win_ratio':'Win ratio', 'total_wins':'Total wins'},
                 size='total_wins', size_max=30,
-                width=640, height=640)
+                width=640, height=640,
+                hover_data={'color': False})
 
 
 win_imp.update_layout(
