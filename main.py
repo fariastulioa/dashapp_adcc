@@ -30,14 +30,17 @@ pio.templates[pio.templates.default] = template
 fdf = pd.read_csv('fighters_dataset.csv')
 mdf = pd.read_csv('adcc_matches.csv')
 
+pdf = fdf.copy()
+pdf['female'] = pdf['female'].apply(lambda x: 'Female' if x == 1 else 'Male')
+pdf['champion'] = pdf['champion'].apply(lambda x: 'Yes' if x == 1 else 'No')
 
 # Plots the distribution between win rates and submission rates
 # Generates the chart object by instanciating a plotly express histogram
-win_sub_title = px.scatter(fdf, x='win_ratio', y='sub_win_ratio', hover_name="name",
-                color=fdf['champion'].astype(str),
+win_sub_title = px.scatter(pdf, x='win_ratio', y='sub_win_ratio', hover_name="name",
+                color=pdf['champion'].astype(str),
                 labels={'color': 'Has title?', 'total_wins':'Total wins', 'sub_win_ratio':'Submission ratio', 'win_ratio':'Win ratio'},
                 size='total_wins', width=600, height=600,
-                hover_data={'champion':False})
+                )
 
 
 win_sub_title.update_layout(
@@ -53,7 +56,7 @@ win_sub_title.update_layout(
 )
 
 # Edit legend labels for understandability
-newnames = {'0':'No', '1': 'Title winner'}
+newnames = {'No':'No', 'Yes': 'Title winner'}
 win_sub_title.for_each_trace(lambda t: t.update(name = newnames[t.name]))
 
 # Display observation under title explaining bubble size
@@ -75,8 +78,8 @@ win_sub_title.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines',
 
 
 
-points = px.scatter(fdf, x='suffered_points_per_fight', y='scored_points_per_fight', hover_name="name",
-    color=fdf['female'].astype(str), hover_data={'female':False},
+points = px.scatter(pdf, x='suffered_points_per_fight', y='scored_points_per_fight', hover_name="name",
+    color=pdf['female'].astype(str), hover_data={'female':False},
     labels={'color': 'Sex', 'suffered_points_per_fight':'Avg. points conceded', 'scored_points_per_fight':'Avg. points scored'},
     width=600, height=600,
     )
@@ -94,13 +97,10 @@ points.update_layout(
     },
     xaxis_title="Average points conceded per fight", yaxis_title="Average points scored per fight",
     legend=dict(x=0.75, y=0.99,bgcolor='rgba(0, 0, 0, 0)'), yaxis=dict(side='right')
-
 )
 
-# Renames the legend labels for understandability
-newnames = {'0':'Male', '1': 'Female'}
-points.for_each_trace(lambda t: t.update(name = newnames[t.name]))
-
+# points.update_traces(hovertemplate="Athlete: %{}<br>Avg. points scored: %{y}<br>Avg. points conceded: %{x}")
+points.update_traces()
 
 # Generating methods over years plot
 # Calculate likelihood for each category over the years and convert to percentages
@@ -942,8 +942,8 @@ titles.update_layout(annotations=legend_annotations)
 
 
 # Generates the chart object by instanciating a plotly express histogram
-win_imp = px.scatter(fdf, x='avg_match_importance', y='win_ratio', hover_name="name",
-                color=fdf['champion'].astype(str),
+win_imp = px.scatter(pdf, x='avg_match_importance', y='win_ratio', hover_name="name",
+                color=pdf['champion'].astype(str),
                 labels={'color': 'Has title?', 'avg_match_importance':'Avg. match importance', 'win_ratio':'Win ratio', 'total_wins':'Total wins'},
                 size='total_wins', size_max=30,
                 width=640, height=640,
@@ -975,10 +975,6 @@ legend_annotations = [
     )]
 win_imp.update_layout(annotations=legend_annotations, yaxis=dict(side='right'))
 
-
-# Renames the legend labels for understandability
-newnames = {'0':'No', '1': 'Title winner'}
-win_imp.for_each_trace(lambda t: t.update(name = newnames[t.name]))
 
 
 
